@@ -2,35 +2,6 @@
 
 > A system for managing small scripts.
 
-## Usage
-
-### Installation
-
-Python 3.6 or later is required.
-
-```sh
-$ git clone https://github.com/dhsavell/scriptoids.git ~/scriptoids
-$ cd ~/scriptoids && pip3 install -r requirements.txt
-```
-
-Finally, add `~/scriptoids/bin` to your PATH.
-
-### Creating a scriptoid
-```sh
-$ ./scriptoid.py new your_script_name
-```
-
-### Linking and using a scriptoid
-```sh
-$ ./scriptoid.py link your_script_name
-$ your_script_name
-```
-
-### Unlinking a scriptoid
-```sh
-$ ./scriptoid.py unlink your_script_name
-```
-
 ## Overview
 
 "Scriptoids" are small scripts contained in folders with `script_info.toml`

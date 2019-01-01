@@ -16,30 +16,6 @@ SCRIPT_CONFIG_REQUIRED_FIELDS = ['name', 'entry']
 FILENAME_VALIDATION_REGEX = re.compile(r'^[\w\-. ]+$')
 
 
-def info(msg):
-    """
-    Prints an informational message.
-    :param msg: Message to display.
-    """
-    print(f'{Style.BRIGHT}{Fore.BLACK}  {msg}{Style.RESET_ALL}')
-
-
-def success(msg):
-    """
-    Prints a message indicating success.
-    :param msg: Message to display.
-    """
-    print(f'{Style.BRIGHT}{Fore.GREEN}✔ {Fore.BLACK}{msg}{Style.RESET_ALL}')
-
-
-def die(msg, exit_code=1):
-    """
-    Prints a message denoting a failure and exits with a given exit code.
-    :param msg: Message to display.
-    :param exit_code: Code to return when exiting.
-    """
-    sys.stderr.write(f'{Style.BRIGHT}{Fore.RED}✘ An error occurred: {Fore.BLACK}{msg}{Style.RESET_ALL}\n')
-    exit(exit_code)
 
 
 try:
