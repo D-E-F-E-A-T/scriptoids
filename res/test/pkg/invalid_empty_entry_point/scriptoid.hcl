@@ -1,0 +1,1 @@
+name = "invalid package missing entry point"
