@@ -1,6 +1,0 @@
-[script]
-name = "shim"
-entry = "shim.sh"
-description = "A utility for quickly creating symlink shims and adding them to a PATH-accessible location."
-script_dependencies = []
-path_dependencies = []
