@@ -20,6 +20,10 @@ type Environment struct {
 	PackageDirectory string
 }
 
+func NewEnvironment(binDirectory string, packageDirectory string) *Environment {
+	return &Environment{BinDirectory: binDirectory, PackageDirectory: packageDirectory}
+}
+
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
