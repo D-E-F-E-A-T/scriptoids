@@ -3,6 +3,7 @@ package cli
 import (
 	"fmt"
 	"github.com/dhsavell/scriptoids/pkg/environment"
+	"io/ioutil"
 	"path"
 )
 
@@ -89,5 +90,43 @@ func ListPackages(d *Display, env *environment.Environment) {
 		}
 
 		fmt.Printf("%-15s %-10s %-10s %-10s %s\n", pkg.Name, pkg.Version, pkgStatus, linkedStr, pkg.Description)
+	}
+}
+
+func InitPackage(d *Display, path string, name string, version string, description string, entrypoint string) {
+	if path == "" {
+		d.Failure("No output path specified.")
+		return
+	}
+
+	if name == "" {
+		d.Failure("No scriptoid name specified.")
+		return
+	}
+
+	if version == "" {
+		d.Failure("No scriptoid version specified.")
+		return
+	}
+
+	if entrypoint == "" {
+		d.Failure("No scriptoid entry point specified.")
+		return
+	}
+
+	pkgDef := fmt.Sprintf(
+		"name = %q\nversion = %q\ndescription = %q\nentrypoint = %q\n",
+		name,
+		version,
+		description,
+		entrypoint,
+	)
+
+	err := ioutil.WriteFile(path, []byte(pkgDef), 777)
+
+	if err != nil {
+		d.Failure("Failed to write to file %s.", path)
+	} else {
+		d.Success("Created a scriptoid definition at %s.", path)
 	}
 }

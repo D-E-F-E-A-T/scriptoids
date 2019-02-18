@@ -27,12 +27,12 @@ func main() {
 			Value:  path.Join(os.Getenv("HOME"), ".scriptoids", "pkg"),
 		},
 		cli.BoolFlag{
-			Name:        "no-color",
-			Usage:       "if specified, no colored output will be displayed",
+			Name:  "no-color",
+			Usage: "if specified, no colored output will be displayed",
 		},
 		cli.BoolFlag{
-			Name:        "no-symbols",
-			Usage:       `if specified, labels like "Success" will be displayed instead of symbols like check marks`,
+			Name:  "no-symbols",
+			Usage: `if specified, labels like "Success" will be displayed instead of symbols like check marks`,
 		},
 	}
 
@@ -82,12 +82,56 @@ func main() {
 			},
 		},
 		{
-			Name: "list",
+			Name:    "list",
 			Aliases: []string{"ls"},
-			Usage: "lists all installed packages",
+			Usage:   "lists all installed packages",
 
-			Action: func (c *cli.Context) error {
+			Action: func(c *cli.Context) error {
 				scli.ListPackages(display, env)
+				return nil
+			},
+		},
+		{
+			Name:    "init",
+			Aliases: []string{"new"},
+			Usage:   "initializes a new scriptoid.hcl file",
+
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "path",
+					Usage: "output filename",
+					Value: "./scriptoid.hcl",
+				},
+				cli.StringFlag{
+					Name:  "name",
+					Usage: "scriptoid name",
+
+				},
+				cli.StringFlag{
+					Name:  "version",
+					Usage: "scriptoid version",
+					Value: "0.0.0",
+				},
+				cli.StringFlag{
+					Name:  "desc",
+					Usage: "scriptoid description",
+				},
+				cli.StringFlag{
+					Name:  "entry",
+					Usage: "scriptoid entry point",
+				},
+			},
+
+			Action: func(c *cli.Context) error {
+				scli.InitPackage(
+					display,
+					c.String("path"),
+					c.String("name"),
+					c.String("version"),
+					c.String("desc"),
+					c.String("entry"),
+				)
+
 				return nil
 			},
 		},
