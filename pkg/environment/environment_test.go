@@ -86,6 +86,16 @@ func TestEnvironment_GetInstalledPackageByName_Invalid(t *testing.T) {
 	req.NotNil(err)
 }
 
+func TestEnvironment_GetAllInstalledPackages(t *testing.T) {
+	req := require.New(t)
+	env := MustGetTestEnv()
+
+	packages, err := env.GetAllInstalledPackages()
+
+	req.Nil(err)
+	req.Len(packages, len([]string{"invalid_empty_entry_point", "invalid_missing_entry_point", "package1"}))
+}
+
 func TestEnvironment_IsPackageValid_ValidPackage(t *testing.T) {
 	req := require.New(t)
 	env := MustGetTestEnv()

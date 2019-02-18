@@ -65,3 +65,29 @@ func UnlinkPackages(d *Display, env *environment.Environment, pkgNames []string)
 		d.Success("Unlinked %d %s", successes, pkgStr)
 	}
 }
+
+func ListPackages(d *Display, env *environment.Environment) {
+	pkgs, err := env.GetAllInstalledPackages()
+
+	if err != nil {
+		d.Failure("Failed to list packages. Does the package directory exist?")
+		return
+	}
+
+	fmt.Printf("%-15s %-10s %-10s %-10s %s\n", "Name", "Version", "Status", "Linked?", "Description")
+	for _, pkg := range pkgs {
+		pkgStatus := "OK"
+
+		ok, err := env.IsPackageValid(pkg)
+		if err != nil || !ok {
+			pkgStatus = "Error"
+		}
+
+		linkedStr := "No"
+		if env.IsPackageLinked(pkg) {
+			linkedStr = "Yes"
+		}
+
+		fmt.Printf("%-15s %-10s %-10s %-10s %s\n", pkg.Name, pkg.Version, pkgStatus, linkedStr, pkg.Description)
+	}
+}

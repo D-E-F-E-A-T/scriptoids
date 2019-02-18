@@ -19,6 +19,14 @@ func (d *Display) getPrefix(symbol string, label string) string {
 	}
 }
 
+func (d *Display) Color(colored Value, monochrome string) string {
+	if d.NoColor {
+		return monochrome
+	} else {
+		return colored.String()
+	}
+}
+
 func (d *Display) Info(msg string, a ...interface{}) {
 	prefix := d.getPrefix(".", "Info:")
 	formattedMsg := fmt.Sprintf(msg, a...)

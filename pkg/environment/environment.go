@@ -59,6 +59,24 @@ func (e *Environment) GetInstalledPackageByName(name string) (Package, error) {
 	return p, nil
 }
 
+func (e *Environment) GetAllInstalledPackages() ([]Package, error) {
+	files, err := ioutil.ReadDir(e.PackageDirectory)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var packages []Package
+	for _, file := range files {
+		pkg, err := e.GetInstalledPackageByName(file.Name())
+		if err == nil {
+			packages = append(packages, pkg)
+		}
+	}
+
+	return packages, nil
+}
+
 // IsPackageValid determines whether or not an existing Package is valid. A package is considered valid if its name is
 // not blank and its entry point exists.
 func (e *Environment) IsPackageValid(p Package) (bool, error) {

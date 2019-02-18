@@ -81,6 +81,16 @@ func main() {
 				return nil
 			},
 		},
+		{
+			Name: "list",
+			Aliases: []string{"ls"},
+			Usage: "lists all installed packages",
+
+			Action: func (c *cli.Context) error {
+				scli.ListPackages(display, env)
+				return nil
+			},
+		},
 	}
 
 	err := app.Run(os.Args)
