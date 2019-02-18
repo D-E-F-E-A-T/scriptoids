@@ -1,8 +1,6 @@
 package environment
 
 import (
-	"errors"
-	"fmt"
 	"github.com/hashicorp/hcl"
 	"io/ioutil"
 	"os"
@@ -63,8 +61,16 @@ func (e *Environment) GetInstalledPackageByName(name string) (Package, error) {
 
 // IsPackageValid determines whether or not an existing Package is valid. A package is considered valid if its name is
 // not blank and its entry point exists.
-func (e *Environment) IsPackageValid(p Package) bool {
-	return p.EntryPoint != "" && p.Name != "" && fileExists(path.Join(e.PackageDirectory, p.Name, p.EntryPoint))
+func (e *Environment) IsPackageValid(p Package) (bool, error) {
+	if p.EntryPoint == "" || p.Name == "" {
+		return false, EmptyIdentifiersError
+	}
+
+	if !fileExists(path.Join(e.PackageDirectory, p.Name, p.EntryPoint)) {
+		return false, InvalidEntryPointError
+	}
+
+	return true, nil
 }
 
 // IsPackageLinked determines whether or not a given package has been linked to this Environment's BinDirectory.
@@ -79,16 +85,22 @@ func (e *Environment) IsPackageLinked(p Package) bool {
 //
 // LinkPackage requires that the given package is installed, valid, and unlinked.
 func (e *Environment) LinkPackage(p Package) error {
-	if !e.IsPackageValid(p) {
-		return errors.New(fmt.Sprintf("package is in an invalid state: %s", p.Name))
+	valid, err := e.IsPackageValid(p)
+
+	if err != nil {
+		return err
+	}
+
+	if !valid {
+		return InvalidStateError
 	}
 
 	if e.IsPackageLinked(p) {
-		return errors.New(fmt.Sprintf("package is already linked: %s", p.Name))
+		return AlreadyLinkedError
 	}
 
 	entryPoint := path.Join(e.PackageDirectory, p.Name, p.EntryPoint)
-	err := os.Symlink(entryPoint, path.Join(e.BinDirectory, p.Name))
+	err = os.Symlink(entryPoint, path.Join(e.BinDirectory, p.Name))
 
 	return err
 }
@@ -100,7 +112,7 @@ func (e *Environment) LinkPackage(p Package) error {
 // UnlinkPackage will remove any file with the given package's name from the bin directory.
 func (e *Environment) UnlinkPackage(p Package) error {
 	if !e.IsPackageLinked(p) {
-		return errors.New(fmt.Sprintf("package is not linked: %s", p.Name))
+		return NotLinkedError
 	}
 
 	return os.Remove(path.Join(e.BinDirectory, p.Name))
