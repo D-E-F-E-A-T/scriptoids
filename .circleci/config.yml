@@ -13,3 +13,6 @@ jobs:
 
       - run: go get -v -t -d ./...
       - run: go test -v ./...
+      - run: go build -o ./out/scriptoids cmd/main.go
+      - store_artifacts:
+          path: ./out
