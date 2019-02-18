@@ -1,7 +1,0 @@
-# Linked scriptoids
-bin/*
-!bin/.gitkeep
-
-# Editors
-.idea/
-.vscode/
