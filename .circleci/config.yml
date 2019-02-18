@@ -45,6 +45,12 @@ workflows:
   test_and_build:
     jobs:
       - setup
-      - test
-      - build
-      - create_scriptoid_artifact
+      - test:
+          requires:
+            - setup
+      - build:
+          requires:
+            - test
+      - create_scriptoid_artifact:
+          requires:
+            - build
