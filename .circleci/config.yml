@@ -14,7 +14,7 @@ jobs:
       - run: go get -v -t -d ./...
       - run: go test -v ./...
       - run: go build -o ./out/scriptoids cmd/main.go
-      - run: ./out/sciptoids init --path ./out/scriptoid.hcl --name scriptoids --version 0.0.0 --entrypoint scriptoids
+      - run: ./out/scriptoids init --path ./out/scriptoid.hcl --name scriptoids --version 0.0.0 --entrypoint scriptoids
       - run: tar -cvf ./out/scriptoids.tar ./out/scriptoids ./out/scriptoid.hcl
       - store_artifacts:
           path: ./out
