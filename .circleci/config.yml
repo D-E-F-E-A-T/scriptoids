@@ -4,7 +4,7 @@
 version: 2
 
 jobs:
-  setup:
+  build:
     docker:
       - image: circleci/golang:1.11
 
@@ -12,45 +12,9 @@ jobs:
     steps:
       - checkout
       - run: go get -v -t -d ./...
-
-  test:
-    docker:
-      - image: circleci/golang:1.11
-
-    working_directory: /go/src/github.com/dhsavell/scriptoids
-    steps:
       - run: go test -v ./...
-
-  build:
-    docker:
-      - image: circleci/golang:1.11
-
-    working_directory: /go/src/github.com/dhsavell/scriptoids
-    steps:
       - run: go build -o ./out/scriptoids cmd/main.go
-
-  create_scriptoid_artifact:
-    docker:
-      - image: circleci/golang:1.11
-
-    working_directory: /go/src/github.com/dhsavell/scriptoids/out
-    steps:
-      - run: ./sciptoids init --path ./scriptoid.hcl --name scriptoids --version 0.0.0 --entrypoint scriptoids
-      - run: tar -cvf ./scriptoids.tar ./scriptoids ./scriptoid.hcl
+      - run: ./out/sciptoids init --path ./out/scriptoid.hcl --name scriptoids --version 0.0.0 --entrypoint scriptoids
+      - run: tar -cvf ./out/scriptoids.tar ./out/scriptoids ./out/scriptoid.hcl
       - store_artifacts:
-          path: .
-
-workflows:
-  version: 2
-  test_and_build:
-    jobs:
-      - setup
-      - test:
-          requires:
-            - setup
-      - build:
-          requires:
-            - test
-      - create_scriptoid_artifact:
-          requires:
-            - build
+          path: ./out
