@@ -1,4 +1,4 @@
-package scriptoids
+package environment
 
 import (
 	"errors"

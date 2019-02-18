@@ -1,4 +1,4 @@
-package scriptoids
+package environment
 
 import (
 	"github.com/stretchr/testify/require"

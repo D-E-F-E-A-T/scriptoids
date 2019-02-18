@@ -1,4 +1,4 @@
-package scriptoids
+package environment
 
 // A Package represents a script/binary that's been installed by Scriptoids.
 type Package struct {

@@ -2,12 +2,57 @@ package main
 
 import (
 	"fmt"
-	"github.com/dhsavell/scriptoids/pkg/scriptoids"
+	"github.com/dhsavell/scriptoids/pkg/environment"
+	. "github.com/logrusorgru/aurora"
 	"github.com/urfave/cli"
 	"log"
 	"os"
 	"path"
 )
+
+var (
+	NoColor   = false
+	NoSymbols = false
+)
+
+func printInfo(msg string) {
+	prefix := "."
+	if NoSymbols {
+		prefix = "Info:"
+	}
+
+	if NoColor {
+		fmt.Println(prefix, msg)
+	} else {
+		fmt.Println(Bold(Black(prefix)), Bold(Black(msg)))
+	}
+}
+
+func printSuccess(msg string) {
+	prefix := "✔"
+	if NoSymbols {
+		prefix = "Success:"
+	}
+
+	if NoColor {
+		fmt.Println(prefix, msg)
+	} else {
+		fmt.Println(Green(prefix), msg)
+	}
+}
+
+func printFailure(msg string) {
+	prefix := "✘"
+	if NoSymbols {
+		prefix = "Error:"
+	}
+
+	if NoColor {
+		fmt.Println(prefix, msg)
+	} else {
+		fmt.Println(Red(prefix), msg)
+	}
+}
 
 func main() {
 	app := cli.NewApp()
@@ -26,31 +71,53 @@ func main() {
 			EnvVar: "SCRIPTOIDS_PKG",
 			Value:  path.Join(os.Getenv("HOME"), ".scriptoids", "pkg"),
 		},
+		cli.BoolFlag{
+			Name:        "no-color",
+			Usage:       "if specified, no colored output will be displayed",
+			Destination: &NoColor,
+		},
+		cli.BoolFlag{
+			Name:        "no-symbols",
+			Usage:       `if specified, labels like "Success" will be displayed instead of symbols like check marks`,
+			Destination: &NoSymbols,
+		},
 	}
 
 	app.Commands = []cli.Command{
 		{
 			Name:    "link",
 			Aliases: []string{"l"},
-			Usage:   "links a package, enabling it in your PATH",
+			Usage:   "links packages, enabling them in your PATH",
 
 			Action: func(c *cli.Context) error {
 				if c.NArg() < 1 {
 					fmt.Println("no packages specified")
 				}
 
-				env := scriptoids.NewEnvironment(c.GlobalString("bindir"), c.GlobalString("pkgdir"))
+				env := environment.NewEnvironment(c.GlobalString("bindir"), c.GlobalString("pkgdir"))
+				successes := c.NArg()
 
 				for _, name := range c.Args() {
 					pkg, err := env.GetInstalledPackageByName(name)
 					if err != nil {
-						return err
+						printFailure(fmt.Sprintf("No such package %s, skipping...", name))
+						successes--
+						continue
 					}
 
 					err = env.LinkPackage(pkg)
 					if err != nil {
-						return err
+						printFailure(fmt.Sprintf("Failed to create link for package %s. Is it already linked?", name))
+						successes--
+						continue
 					}
+
+					printInfo(fmt.Sprintf("%s => %s", path.Join(env.PackageDirectory, pkg.EntryPoint),
+						path.Join(env.BinDirectory, pkg.Name)))
+				}
+
+				if successes > 0 {
+					printSuccess(fmt.Sprintf("Linked %d packages", successes))
 				}
 
 				return nil
@@ -59,25 +126,36 @@ func main() {
 		{
 			Name:    "unlink",
 			Aliases: []string{"u"},
-			Usage:   "unlinks a package, removing it from your PATH",
+			Usage:   "unlinks packages, removing them from your PATH",
 
 			Action: func(c *cli.Context) error {
 				if c.NArg() < 1 {
 					fmt.Println("no packages specified")
 				}
 
-				env := scriptoids.NewEnvironment(c.GlobalString("bindir"), c.GlobalString("pkgdir"))
+				env := environment.NewEnvironment(c.GlobalString("bindir"), c.GlobalString("pkgdir"))
+				successes := c.NArg()
 
 				for _, name := range c.Args() {
 					pkg, err := env.GetInstalledPackageByName(name)
 					if err != nil {
-						return err
+						printFailure(fmt.Sprintf("No such package %s, skipping...", name))
+						successes--
+						continue
 					}
 
 					err = env.UnlinkPackage(pkg)
 					if err != nil {
-						return err
+						printFailure(fmt.Sprintf("Failed to unlink package %s. Was it linked in the first place?", name))
+						successes--
+						continue
 					}
+
+					printInfo(fmt.Sprintf("Removed %s", path.Join(env.BinDirectory, pkg.Name)))
+				}
+
+				if successes > 0 {
+					printSuccess(fmt.Sprintf("Unlinked %d packages", successes))
 				}
 
 				return nil
